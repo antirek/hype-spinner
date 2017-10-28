@@ -9,8 +9,6 @@
         overflow: hidden;
         background-color: #F0F0F0;
       }
-
-
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
@@ -77,11 +75,28 @@
 
         socket.on('evt', function(msg){
           console.log('evt received', msg);
+          /*
           star.setAttrs({
             x: msg.x,
             y: msg.y
           })
-          stage.draw();
+          */
+
+          var angularSpeed = 90;
+
+          var anim = new Konva.Animation(function(frame) {
+              var angleDiff = frame.timeDiff * angularSpeed / 1000;
+              star.rotate(angleDiff);
+
+          }, layer);
+    
+          anim.start();
+
+          setTimeout(()=> {
+            anim.stop();
+          }, 3000);
+
+          //stage.draw();
         });
 
         
