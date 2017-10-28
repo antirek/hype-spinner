@@ -14,11 +14,20 @@ app.get('/chat', (req, res) => {
 
 
 io.on('connection', (socket) => {
+
   socket.on('chat message', (msg) => {
   	var address = socket.handshake.address;
   	console.log(socket.id, address);
   	console.log('msg:', msg);
     io.emit('chat message', msg);
+  });
+
+
+  socket.on('evt', (msg) => {
+  	var address = socket.handshake.address;
+  	console.log(socket.id, address);
+  	console.log('msg:', msg);
+    io.emit('evt', msg);
   });
 });
 
