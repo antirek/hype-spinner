@@ -1,5 +1,8 @@
 {
   "name": "spinner",
-  "alias": "spinner.now.sh",
-  "public": true
+  "alias": "https://spinner-ymciofoktx.now.sh",
+  "public": true,
+  "env": {
+    "PRODUCTION": true
+  }
 }
