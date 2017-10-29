@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>demo</title>
+    <title>Hype Spinner</title>
     <style>
       body {
         margin: 0;
@@ -20,14 +20,18 @@
     <script type="text/javascript">
 
       $(() => {
-        var socket;
+
+        window.addEventListener("orientationchange", function() {
+          console.log(screen.orientation);
+          window.location.reload();
+        }, false);
+
+        var socket, star;
+
         socket = io({transports: ['websocket']});
 
         var width = window.innerWidth;
         var height = window.innerHeight;
-        var star;
-
-        var tween = null;
 
         var stage = new Konva.Stage({
           container: 'container',
@@ -36,15 +40,15 @@
         });
 
         var layer = new Konva.Layer();
-        var dragLayer = new Konva.Layer();
 
         var scale = 1;
 
         var imageObj = new Image();
+
         imageObj.onload = () => {
           star = new Konva.Image({
-            x: 400,
-            y: 400,
+            x: stage.getWidth() / 2,
+            y: stage.getHeight() / 2,
             image: imageObj,
             width: 600,
             height: 600,
@@ -56,67 +60,35 @@
           });
 
           star.on('dragmove', (evt) => {
-            console.log('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
             socket.emit('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
           })
 
-          // add the shape to the layer
           layer.add(star);
-          // add the layer to the stage
-          //stage.add(layer);
           stage.draw();
 
-          stage.add(layer, dragLayer);
-
-          
-
+          stage.add(layer);
         };
 
         imageObj.src = '/spinner.png';
 
-        
-
-        //layer.add(star);
-
-        
-
-
-        
-        
-
-        socket.on('evt', function(msg){
-          console.log('evt received', msg);
-          /*
-          star.setAttrs({
-            x: msg.x,
-            y: msg.y
-          })
-          */
-
+        socket.on('evt', (msg) => {
           var angularSpeed = 90;
 
-          var anim = new Konva.Animation(function(frame) {
+          var anim = new Konva.Animation((frame) => {
               var angleDiff = frame.timeDiff * angularSpeed / 1000;
               star.rotate(angleDiff);
 
           }, layer);
-    
+
           anim.start();
 
           setTimeout(()=> {
             anim.stop();
           }, 3000);
 
-          //stage.draw();
-        });
-
-          
-        
-        
+        });        
       });
       
-      
-
     </script>
   </body>
 </html>

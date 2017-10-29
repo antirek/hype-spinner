@@ -4,12 +4,11 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 const console = require('tracer').colorConsole();
 
+let counter = 0;
+const production = process.env.PRODUCTION;
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
-});
-
-app.get('/chat', (req, res) => {
-  res.sendFile(__dirname + '/chat.html');
 });
 
 app.get('/spinner.png', (req, res) => {
@@ -17,21 +16,22 @@ app.get('/spinner.png', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-
-  socket.on('chat message', (msg) => {
-  	var address = socket.handshake.address;
-  	console.log(socket.id, address);
-  	console.log('msg:', msg);
-    io.emit('chat message', msg);
-  });
-
+  counter++;
+  console.log('counter++:', counter);
 
   socket.on('evt', (msg) => {
   	var address = socket.handshake.address;
-  	console.log(socket.id, address);
-  	console.log('msg:', msg);
+  	if (!production) {
+      console.log(socket.id, address);
+      console.log('msg:', msg);
+    }
     io.emit('evt', msg);
   });
+
+  socket.on('disconnect', ()=> {
+    counter--;
+    console.log('counter--:', counter);
+  })
 });
 
 http.listen(port, () => {
