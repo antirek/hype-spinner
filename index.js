@@ -12,6 +12,9 @@ app.get('/chat', (req, res) => {
   res.sendFile(__dirname + '/chat.html');
 });
 
+app.get('/spinner.png', (req, res) => {
+  res.sendFile(__dirname + '/spinner.png');
+});
 
 io.on('connection', (socket) => {
 

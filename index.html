@@ -40,37 +40,48 @@
 
         var scale = 1;
 
-        star = new Konva.Star({
-          x: stage.getWidth() / 2,
-          y: stage.getHeight() / 2,
-          numPoints: 5,
-          innerRadius: 130,
-          outerRadius: 250,
-          fill: '#89b717',
-          opacity: 0.8,
-          draggable: true,
-          scale: {
-            x : scale,
-            y : scale
-          },
-          rotation: 0,
-          shadowColor: 'black',
-          shadowBlur: 10,
-          shadowOffset: {
-            x : 5,
-            y : 5
-          },
-          shadowOpacity: 0.6,
-          // custom attribute
-          startScale: scale
-        });
+        var imageObj = new Image();
+        imageObj.onload = () => {
+          star = new Konva.Image({
+            x: 400,
+            y: 400,
+            image: imageObj,
+            width: 600,
+            height: 600,
+            draggable: true,
+            offset: {
+              x: 300,
+              y: 300
+            }
+          });
 
-        layer.add(star);
+          star.on('dragmove', (evt) => {
+            console.log('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
+            socket.emit('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
+          })
 
-        star.on('dragmove', (evt) => {
-          console.log('evt', evt.target.attrs.x, evt.target.attrs.y);
-          socket.emit('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
-        })
+          // add the shape to the layer
+          layer.add(star);
+          // add the layer to the stage
+          //stage.add(layer);
+          stage.draw();
+
+          stage.add(layer, dragLayer);
+
+          
+
+        };
+
+        imageObj.src = '/spinner.png';
+
+        
+
+        //layer.add(star);
+
+        
+
+
+        
         
 
         socket.on('evt', function(msg){
@@ -99,44 +110,9 @@
           //stage.draw();
         });
 
-        
-        
-        stage.add(layer, dragLayer);
-
-        stage.on('dragstart', function(evt) {
-          var shape = evt.target;
-          // moving to another layer will improve dragging performance
-          shape.moveTo(dragLayer);
-          stage.draw();
           
-          if (tween) {
-            tween.pause();
-          }
-          shape.setAttrs({
-            shadowOffset: {
-              x: 15,
-              y: 15
-            },
-            scale: {
-              x: shape.getAttr('startScale') * 1.2,
-              y: shape.getAttr('startScale') * 1.2
-            }
-          });
-        });
-
-        stage.on('dragend', function(evt) {
-          var shape = evt.target;
-          shape.moveTo(layer);
-          stage.draw();
-          shape.to({
-            duration: 0.5,
-            easing: Konva.Easings.ElasticEaseOut,
-            scaleX: shape.getAttr('startScale'),
-            scaleY: shape.getAttr('startScale'),
-            shadowOffsetX: 5,
-            shadowOffsetY: 5
-          });
-        });
+        
+        
       });
       
       
