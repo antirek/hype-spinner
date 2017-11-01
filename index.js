@@ -19,6 +19,8 @@ io.on('connection', (socket) => {
   counter++;
   console.log('counter++:', counter);
 
+  io.emit('count', counter);
+
   socket.on('evt', (msg) => {
   	var address = socket.handshake.address;
   	if (!production) {
@@ -31,6 +33,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', ()=> {
     counter--;
     console.log('counter--:', counter);
+
+    io.emit('count', counter);
   })
 });
 

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Hype Spinner</title>
+    <title>Spinner Now!</title>
     <style>
       body {
         margin: 0;
@@ -9,14 +9,39 @@
         overflow: hidden;
         background-color: #F0F0F0;
       }
+      #desc {
+        position : absolute;
+        top: 5px;
+        left: 5px;
+      }
+      #overlay {
+        position : absolute;
+        top: 5px;
+        right: 5px;
+      }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.rawgit.com/konvajs/konva/1.3.0/konva.js"></script>
   </head>
   <body>
+    <div id="desc">
+    <ul>
+      <li>Отправь ссылку другу и вращайте спиннеры вместе</li>
+      <li>Онлайн: <span id="counter"></span></li>
+    </ul>
+    
+    
+    <img src="/qr.png">
+    </div>
     
     <div id="container"></div>
+
+    <div id="overlay">
+    <ul>
+      
+    </ul>
+    </div>
     <script type="text/javascript">
 
       $(() => {
@@ -86,9 +111,18 @@
             anim.stop();
           }, 3000);
 
-        });        
+        }); 
+
+
+        socket.on('count', (msg) => {
+          $('#counter').html(msg);
+        });
+
       });
       
     </script>
+
+    <!-- Yandex.Metrika counter --> <script type="text/javascript" > (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter46493223 = new Ya.Metrika({ id:46493223, clickmap:true, trackLinks:true, accurateTrackBounce:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/46493223" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+    
   </body>
 </html>
