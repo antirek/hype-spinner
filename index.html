@@ -28,9 +28,10 @@
     <div id="desc">
     <ul>
       <li>Отправь ссылку <a href="https://spinow.ru">spinow.ru</a> другу и крутите спиннеры вместе</li>
-      <li>Онлайн: <span id="counter"></span></li>
+      <li>Онлайн: <span id="online"></span></li>
+      <li>Майн: <span id="mine"></span></li>
     </ul>
-    <img src="/qr.png">
+    <img src="/qr.gif">
     </div>
     
     <div id="container"></div>
@@ -83,7 +84,7 @@
           });
 
           star.on('dragmove', (evt) => {
-            socket.emit('evt', {x: evt.target.attrs.x, y: evt.target.attrs.y});
+            socket.emit('spin', 'fire!');
           })
 
           layer.add(star);
@@ -94,7 +95,7 @@
 
         imageObj.src = '/spinner.png';
 
-        socket.on('evt', (msg) => {
+        socket.on('spin', (spin) => {
           var angularSpeed = 90;
 
           var anim = new Konva.Animation((frame) => {
@@ -112,8 +113,12 @@
         }); 
 
 
-        socket.on('count', (msg) => {
-          $('#counter').html(msg);
+        socket.on('online', (online) => {
+          $('#online').html(online);
+        });
+
+        socket.on('mine', (mine) => {
+          $('#mine').html(mine);
         });
 
       });

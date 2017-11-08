@@ -3,41 +3,79 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3030;
 const console = require('tracer').colorConsole();
+const favicon = require('serve-favicon');
+const path = require('path');
 
-let counter = 0;
+var redis = require('promise-redis')();
+    client = redis.createClient();
+
+let online = 0;
+const MINEKEY = "MINEKEY7";
+
 const production = process.env.PRODUCTION;
 
+app.use(favicon(path.join(__dirname, 'images', 'favicon.ico')))
+
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/spinner.png', (req, res) => {
-  res.sendFile(__dirname + '/spinner.png');
+  res.sendFile(path.join(__dirname, 'images', 'spinner.png'));
+});
+
+app.get('/qr.gif', (req, res) => {
+  res.sendFile(path.join(__dirname, 'images', 'qr-code.gif'));
 });
 
 io.on('connection', (socket) => {
-  counter++;
-  console.log('counter++:', counter);
+  online++;
+  console.log('online++:', online);
+  io.emit('online', online);
 
-  io.emit('count', counter);
+  client.get(MINEKEY)
+    .then((mine) => {
+      socket.emit('mine', mine);
+    });
 
-  socket.on('evt', (msg) => {
-  	var address = socket.handshake.address;
-  	if (!production) {
+  socket.on('spin', (spin) => {
+    
+    var address = socket.handshake.address;
+    if (!production) {
       console.log(socket.id, address);
-      console.log('msg:', msg);
+      console.log('spin:', spin);
     }
-    io.emit('evt', msg);
+    io.emit('spin', spin);
+
+    client.incr(MINEKEY)
+      .then(() => {  
+        return client.get(MINEKEY)      
+      })
+      .then((mine) => {
+        console.log('mine', mine);
+        io.emit('mine', mine);
+      });
   });
 
   socket.on('disconnect', ()=> {
-    counter--;
-    console.log('counter--:', counter);
+    online--;
+    console.log('online--:', online);
 
-    io.emit('count', counter);
+    io.emit('online', online);
   })
 });
 
-http.listen(port, () => {
-  console.log('listening on *:' + port);
+
+
+  
+client.setnx(MINEKEY, "0")
+  .then(() => {
+    client.get(MINEKEY).then((mine) => {
+      console.log('start value of mine', mine);  
+
+      http.listen(port, () => {  
+        console.log('listening on *:' + port);
+      });
+
+    });
 });
