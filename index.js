@@ -12,7 +12,7 @@ var redis = require('promise-redis')();
 let online = 0;
 const MINEKEY = "MINEKEY7";
 
-const production = process.env.PRODUCTION;
+const spinners = ['spinner-1.png', 'spinner-2.png', 'spinner-3.png'];
 
 app.use(favicon(path.join(__dirname, 'images', 'favicon.ico')))
 
@@ -21,7 +21,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/spinner.png', (req, res) => {
-  res.sendFile(path.join(__dirname, 'images', 'spinner.png'));
+  let spinner = spinners[Math.floor(Math.random()*spinners.length)];
+  res.sendFile(path.join(__dirname, 'images', spinner));
 });
 
 app.get('/qr.gif', (req, res) => {
@@ -35,16 +36,15 @@ io.on('connection', (socket) => {
 
   client.get(MINEKEY)
     .then((mine) => {
+      console.log('mine', mine);
       socket.emit('mine', mine);
     });
 
   socket.on('spin', (spin) => {
     
-    var address = socket.handshake.address;
-    if (!production) {
-      console.log(socket.id, address);
-      console.log('spin:', spin);
-    }
+    //var address = socket.handshake.address;
+    //console.log(socket.id, address);
+    //console.log('spin:', spin);
     io.emit('spin', spin);
 
     client.incr(MINEKEY)
@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
         return client.get(MINEKEY)      
       })
       .then((mine) => {
-        console.log('mine', mine);
+        //console.log('mine', mine);
         io.emit('mine', mine);
       });
   });
@@ -60,7 +60,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', ()=> {
     online--;
     console.log('online--:', online);
-
     io.emit('online', online);
   })
 });
